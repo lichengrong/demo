@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 指定xml 和哪一个接口类关联 -->
+
+<mapper namespace="com.tutor.dao.teacher_dao">
+
+
+
+    <!-- 查询全部 -->
+    <select id="query_teacher_info_id" resultType="com.tutor.entity.teacher_info" parameterType="com.tutor.entity.teacher_info">
+      select * from teacher_info where teacher_id =#{teacher_id}
+    </select>
+    <update id="update_teacher_info_count"  parameterType="com.tutor.entity.teacher_info">
+      update  teacher_info set teacher_count=#{teacher_count} where teacher_id =#{teacher_id}
+    </update>
+    <update id="update_teacher_info_photo"  parameterType="com.tutor.entity.teacher_info">
+      update  teacher_info set teacher_photo=#{teacher_photo} where teacher_id =#{teacher_id}
+    </update>
+    <insert id="insert_teacher_info_authentication"  parameterType="com.tutor.entity.teacher_authentication_info">
+      insert into teacher_authentication VALUES(null,#{teacher_id},#{teacher_idcard},#{teacher_school},#{teacher_number},#{teacher_subject},#{teacher_yn_school},#{teacher_academic},#{teacher_certificate})
+    </insert>
+    <update id="update_teacher_info_certify"  parameterType="com.tutor.entity.teacher_info">
+      update  teacher_info set teacher_certify=#{teacher_certify} where teacher_id =#{teacher_id}
+    </update>
+    <update id="update_teacher_info"  parameterType="com.tutor.entity.teacher_info">
+      update  teacher_info set teacher_name=#{teacher_name},teacher_sex=#{teacher_sex},teacher_age=#{teacher_age},teacher_password=#{teacher_password},teacher_iphone=#{teacher_iphone},teacher_address=#{teacher_address} where teacher_id =#{teacher_id}
+    </update>
+    <select id="query_teacher_qpped" resultType="com.tutor.entity.teacher_apped" parameterType="Integer">
+      select * from teacher_appointmented_info limit #{arg0},#{arg1}
+    </select>
+    <update id="update_appointmented_condition"  parameterType="com.tutor.entity.teacher_apped">
+     update teacher_appointmented_info set tappointmented_condition=#{tappointmented_condition} where tappointmented_id=#{tappointmented_id}
+    </update>
+    <delete id="delete_appointmented_condition"  parameterType="com.tutor.entity.teacher_apped">
+        delete from teacher_appointmented_info where tappointmented_id=#{tappointmented_id}
+    </delete>
+    <insert id="insert_record"  parameterType="com.tutor.entity.order_record" >
+		INSERT into order_record VALUES(null,DEFAULT,#{order_address},#{order_subject},DEFAULT,null,#{student_id},#{teacher_id})
+    </insert>
+    <select id="query_record_id"  parameterType="Integer" resultType="com.tutor.entity.order_record">
+        		SELECT * from order_record where teacher_id=#{arg0} LIMIT #{arg1},#{arg2}
+    </select>
+    <select id="query_record_id_all"  parameterType="com.tutor.entity.order_record" resultType="com.tutor.entity.order_record">
+        		SELECT * from order_record where  teacher_id=#{teacher_id}
+    </select>
+    <select id="query_appointmented_id_all"  parameterType="com.tutor.entity.teacher_apped" resultType="com.tutor.entity.teacher_apped">
+        		select * from teacher_appointmented_info where  teacher_id=#{teacher_id}
+    </select>
+
+    <!--    &lt;!&ndash; 根据id查单个 &ndash;&gt;-->
+    <!--    <select id="queryEmpById" parameterType="int" resultMap="empMap">-->
+    <!--select * from empinfo ei inner join deptinfo di on ei.deptId=di.deptId where empId=#{id}-->
+    <!--</select>-->
+
+    <!--    &lt;!&ndash; 添加 &ndash;&gt;-->
+    <!--    <insert id="addEmp" parameterType="empinfo">-->
+    <!--insert into empinfo(deptId,name,sex,age,beginTime,address) values(#{deptinfo.deptId},#{name},#{sex},#{age},#{beginTime},#{address})-->
+    <!--</insert>-->
+
+    <!--    &lt;!&ndash; 删除 &ndash;&gt;-->
+    <!--    <delete id="deleteEmp" parameterType="int">-->
+    <!--delete from empinfo where empId=#{id}-->
+    <!--</delete>-->
+</mapper>

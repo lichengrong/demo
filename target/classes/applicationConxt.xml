@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/mvc
+            http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <context:component-scan base-package="com.tutor.*" />
+
+    <mvc:default-servlet-handler />
+    <!--配置允许放行的静态资源-->
+    <mvc:resources mapping="/WEB-INF/**" location="/WEB-INF/"/>
+
+    <mvc:annotation-driven/>
+    <!-- 视图资源解析器 -->
+    <bean
+            class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="contentType" value="text/html;charset=UTF-8"></property>
+        <property name="prefix" value="/view/"></property>
+        <property name="suffix" value=".ftl"></property>
+    </bean>
+
+    <!-- 静态资源访问 -->
+    <!--如果webapp下你新建了文件夹，想访问里面的静态资源，那么就要在这配置一下-->
+        <mvc:resources location="/images/" mapping="/images/**"/>
+        <mvc:resources location="/css/" mapping="/css/**"/>
+        <mvc:resources location="/js/" mapping="/js/**"/>
+    <mvc:resources location="/layui/" mapping="/js/**"/>
+    <mvc:resources location="/layui/" mapping="/css/**"/>
+    <mvc:resources location="/framework/" mapping="/js/**"/>
+<!--        <mvc:resources location="/view/" mapping="/*.html" />-->
+
+    <!-- 设置freeMarker的配置文件路径 -->
+    <bean id="freemarkerConfiguration" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="location" value="classpath:freemarker.properties"/>
+    </bean>
+
+    <!-- 配置freeMarker的模板路径 -->
+    <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="freemarkerSettings" ref="freemarkerConfiguration"/>
+        <property name="templateLoaderPath">
+            <value>/view/</value>
+        </property>
+    </bean>
+
+    <!-- 配置freeMarker视图解析器 -->
+    <bean
+            class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="viewClass"
+                  value="org.springframework.web.servlet.view.freemarker.FreeMarkerView" />
+        <property name="contentType" value="text/html; charset=utf-8" />
+        <property name="suffix" value=".ftl" />
+        <property name="order" value="0" />
+    </bean>
+
+    <!--Shiro安全框架产生代理子类的方式： 使用cglib方式，放在事务管理器之前-->
+<!--    <aop:aspectj-autoproxy proxy-target-class="true" />-->
+    <!-- 稳健2上传配置 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="utf-8"></property>
+        <property name="maxInMemorySize" value="80000"></property>
+    </bean>
+
+
+
+
+
+    <!--    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />-->
+    <!--    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />-->
+    <!-- 设置数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" >
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/tutor?characterEncoding=UTF-8"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="123456"></property>
+        <!-- 连接池初始化大小为3 -->
+        <property name="initialPoolSize" value="3"/>
+        <!-- 连接池最大为10 -->
+        <property name="maxPoolSize" value="10"/>
+        <!-- 连接池最小为3 -->
+        <property name="minPoolSize" value="3"/>
+        <!-- 连接池在无空闲连接可用时一次性最多创建的新数据库连接数  -->
+        <property name="acquireIncrement" value="5"/>
+        <!-- 连接的最大空闲时间，如果超过这个时间（秒），某个数据库连接还没有被使用，则会断开掉这个连接。如果为0，则永远不会断开连接,即回收此连接 -->
+        <property name="maxIdleTime" value="30"/>
+        <!-- 最大的Statement数量 -->
+        <property name="maxStatements" value="500"/>
+        <!-- 每个连接启动的最大Statement数量 -->
+        <property name="maxStatementsPerConnection" value="50"/>
+        <!-- 同时运行的线程数 -->
+        <property name="numHelperThreads" value="5"/>
+
+    </bean>
+
+
+
+    <!-- MyBaits的SqlSessionFactory实例的创建 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 设置数据源 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 为指定包下的类取别名 -->
+        <property name="typeAliasesPackage" value="com.sec.entry" />
+        <!-- mybatis的配置文件 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml" />
+
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.tutor.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
+
+    <bean id="redisClient" class="redis.clients.jedis.JedisPool">
+        <constructor-arg name="host" value="127.0.0.1"></constructor-arg>
+        <constructor-arg name="port" value="6379"></constructor-arg>
+    </bean>
+    <bean id="jedisClient" class="com.tutor.util.JedisClientSingle"></bean>
+
+    <bean id="aspect" class="com.tutor.aop.aspect"></bean>
+
+
+
+    <aop:config>
+        <!-- 切点 -->
+        <aop:pointcut id="aop1" expression="execution(* com.tutor.contor..*.*())"/>
+
+
+        <!-- 切点 -->
+        <aop:aspect ref="aspect">
+                <aop:after method="before" pointcut-ref="aop1"/>
+        </aop:aspect>
+    </aop:config>
+
+
+</beans>
